@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+        NEXUS_CREDS = credentials('nexus-creds')
+    }
     stages {
         stage('Checkout') {
             steps { checkout scm }
@@ -15,6 +18,9 @@ pipeline {
         }
         stage('Archive') {
             steps { archiveArtifacts artifacts: 'target/*.jar', fingerprint: true }
+        }
+        stage('Push to Nexus') {
+            steps { sh './mvnw -B deploy -DskipTests -s settings.xml' }
         }
     }
 }
